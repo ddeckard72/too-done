@@ -22,7 +22,12 @@ module TooDone
     
         binding.pry
         alist = List.find_or_create_by(name: options[:list],user_id: current_user.id)
-        atask = Task.create(name: task,list: alist)
+        if options[:date] == ""
+          atask = Task.create(name: task,list: alist)
+        else
+          atask = Task.create(name: task,list: alist,due_date: options[:date])
+        end 
+
 
         puts "Added #{task} to #{options[:list]}."
 
@@ -40,7 +45,7 @@ module TooDone
       # BAIL if it doesn't exist and have tasks
       # display the tasks and prompt for which one to edit
       display_list(alist,completed,sort)
-      puts "Enter the name of the completed task:"
+      puts "Enter the name of the task to edit:"
       task_completed = STDIN.gets.chomp
       # allow the user to change the title, due date
     end
