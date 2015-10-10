@@ -46,8 +46,20 @@ module TooDone
       # display the tasks and prompt for which one to edit
       display_list(alist,completed,sort)
       puts "Enter the name of the task to edit:"
-      task_completed = STDIN.gets.chomp
+      task_to_edit = STDIN.gets.chomp
       # allow the user to change the title, due date
+      puts "Enter the field to edit (title or due date)"
+      field_to_edit = STDIN.gets.chomp
+      puts "Enter the new value:"
+      new_value = STDIN.gets.chomp
+
+      task = Task.find_by(name: task_to_edit)
+      if field_to_edit == "due date"
+        task.update(due_date: new_value)
+      else
+        task.update(name: new_value)
+      end
+      puts "#{task.name} updated."
     end
 
     desc "done", "Mark a task as completed."
