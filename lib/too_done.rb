@@ -109,9 +109,11 @@ module TooDone
     option :user, :aliases => :u,
       :desc => "The user which will be deleted (including lists and items)."
     def delete
+      #UT won. Changing code just to commit to github
       # BAIL if both list and user options are provided
       # BAIL if neither list or user option is provided
       # find the matching user or list
+      alist = List.find_or_create_by(name: options[:list],user_id: current_user.id)
       # BAIL if the user or list couldn't be found
       # delete them (and any dependents)
       # delete tasks then the lists then user
