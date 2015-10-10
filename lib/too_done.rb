@@ -2,6 +2,9 @@ require "too_done/version"
 require "too_done/init_db"
 require "too_done/user"
 require "too_done/session"
+require "too_done/list"
+require "too_done/task"
+
 
 require "thor"
 require "pry"
@@ -16,6 +19,13 @@ module TooDone
       :desc => "A Due Date in YYYY-MM-DD format."
     def add(task)
       # find or create the right todo list
+    
+        binding.pry
+        alist = List.find_or_create_by(name: options[:list],user_id: current_user.id)
+        atask = Task.create(name: task,list: alist)
+
+        puts "Added #{task} to #{options[:list]}."
+
       # create a new item under that list, with optional date
     end
 
