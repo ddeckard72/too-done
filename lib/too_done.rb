@@ -60,6 +60,9 @@ module TooDone
       puts "Enter the name of the completed task:"
       task_completed = STDIN.gets.chomp
       #update to completed
+      task = Task.find_by(name: task_completed)
+      task.update(completed: true)
+      puts "#{task_completed} marked as completed"
     end
 
     desc "show", "Show the tasks on a todo list in reverse order."
