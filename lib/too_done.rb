@@ -34,8 +34,12 @@ module TooDone
       :desc => "The todo list whose tasks will be edited."
     def edit
       # find the right todo list
+       alist = List.find_or_create_by(name: options[:list],user_id: current_user.id)
       # BAIL if it doesn't exist and have tasks
       # display the tasks and prompt for which one to edit
+      display_list(alist)
+      puts "Enter the name of the completed task:"
+      task_completed = STDIN.gets.chomp
       # allow the user to change the title, due date
     end
 
@@ -44,8 +48,14 @@ module TooDone
       :desc => "The todo list whose tasks will be completed."
     def done
       # find the right todo list
+      alist = List.find_or_create_by(name: options[:list],user_id: current_user.id)
       # BAIL if it doesn't exist and have tasks
       # display the tasks and prompt for which one(s?) to mark done
+      display_list(alist)
+
+      puts "Enter the name of the completed task:"
+      task_completed = STDIN.gets.chomp
+      #update to completed
     end
 
     desc "show", "Show the tasks on a todo list in reverse order."
@@ -58,7 +68,9 @@ module TooDone
       \t\t\t\t\tLimits results to those with a due date."
     def show
       # find or create the right todo list
+      alist = List.find_or_create_by(name: options[:list],user_id: current_user.id)
       # show the tasks ordered as requested, default to reverse order (recently entered first)
+      display_list(alist)
     end
 
     desc "delete [LIST OR USER]", "Delete a todo list or a user."
@@ -72,6 +84,7 @@ module TooDone
       # find the matching user or list
       # BAIL if the user or list couldn't be found
       # delete them (and any dependents)
+      # delete tasks then the lists then user
     end
 
     desc "switch USER", "Switch session to manage USER's todo lists."
@@ -84,6 +97,15 @@ module TooDone
     def current_user
       Session.last.user
     end
+
+    def display_list(alist)
+      tasks = Task.where(list_id = alist.id).order(id: :desc)
+
+      tasks.each do |task|
+        puts "Completed: #{task.completed}, Task: #{task.name}, Due Date: #{task.due_date}"
+      end
+    end
+
   end
 end
 
