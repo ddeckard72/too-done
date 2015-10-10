@@ -33,11 +33,13 @@ module TooDone
     option :list, :aliases => :l, :default => "*default*",
       :desc => "The todo list whose tasks will be edited."
     def edit
+      completed = false
+      sort = "desc"
       # find the right todo list
        alist = List.find_or_create_by(name: options[:list],user_id: current_user.id)
       # BAIL if it doesn't exist and have tasks
       # display the tasks and prompt for which one to edit
-      display_list(alist)
+      display_list(alist,completed,sort)
       puts "Enter the name of the completed task:"
       task_completed = STDIN.gets.chomp
       # allow the user to change the title, due date
@@ -47,11 +49,13 @@ module TooDone
     option :list, :aliases => :l, :default => "*default*",
       :desc => "The todo list whose tasks will be completed."
     def done
+      completed = false
+      sort = "desc"
       # find the right todo list
       alist = List.find_or_create_by(name: options[:list],user_id: current_user.id)
       # BAIL if it doesn't exist and have tasks
       # display the tasks and prompt for which one(s?) to mark done
-      display_list(alist)
+      display_list(alist,completed,sort)
 
       puts "Enter the name of the completed task:"
       task_completed = STDIN.gets.chomp
@@ -67,10 +71,16 @@ module TooDone
       :desc => "Sorting by 'history' (chronological) or 'overdue'.
       \t\t\t\t\tLimits results to those with a due date."
     def show
+      completed = options[:completed]
+      sort = "desc"
+      if options[:sort] == 'history' || options[:sort] == 'overdue'
+        sort = options[:sort]
+      end
+    
       # find or create the right todo list
       alist = List.find_or_create_by(name: options[:list],user_id: current_user.id)
       # show the tasks ordered as requested, default to reverse order (recently entered first)
-      display_list(alist)
+      display_list(alist,completed,sort)
     end
 
     desc "delete [LIST OR USER]", "Delete a todo list or a user."
@@ -98,8 +108,11 @@ module TooDone
       Session.last.user
     end
 
-    def display_list(alist)
-      tasks = Task.where(list_id = alist.id).order(id: :desc)
+    def display_list(alist,completed,sort)
+      #sort = desc (default) , history or overdue
+      #completed: show completed tasks
+
+      tasks = Task.where(list_id = alist.id, completed: completed).order(id: :desc)
 
       tasks.each do |task|
         puts "Completed: #{task.completed}, Task: #{task.name}, Due Date: #{task.due_date}"
